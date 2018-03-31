@@ -1,31 +1,39 @@
 package pojo;
 
+import web.RemoteSocketHandler;
+
 import javax.websocket.Session;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 public class Remote {
-    private Session session;
-    private String id;
+    private static int RID = 0;
+    private RemoteSocketHandler remoteSocketHandler;
+    private int id;
     private String password;
-    private List<String> client_ids = Collections.synchronizedList(new ArrayList<String>());
-    public Remote(){}
-
-    public Session getSession() {
-        return session;
+    private final List<Client> clientList = Collections.synchronizedList(new ArrayList<Client>());
+    public Remote(){
+        id = RID++;
     }
 
-    public void setSession(Session session) {
-        this.session = session;
+    public RemoteSocketHandler getRemoteSocketHandler() {
+        return remoteSocketHandler;
     }
 
-    public String getId() {
+    public void setRemoteSocketHandler(RemoteSocketHandler remoteSocketHandler) {
+        this.remoteSocketHandler = remoteSocketHandler;
+    }
+
+    public List<Client> getClientList() {
+        return clientList;
+    }
+
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -37,11 +45,40 @@ public class Remote {
         this.password = password;
     }
 
-    public List<String> getClient_ids() {
-        return client_ids;
-    }
+    public boolean verifyClientID(int cid){
+        synchronized (clientList) {
+            for (Client c : clientList) {
+                if (c.getClient_id() == cid) {
+                    return true;
+                }
 
-    public void setClient_ids(List<String> client_ids) {
-        this.client_ids = client_ids;
+            }
+        }
+        return false;
+    }
+    public void addClient(Client client){
+        synchronized (clientList){
+            clientList.add(client);
+        }
+    }
+    public void removeClientByID(int cid){
+        synchronized (clientList){
+            for (int i = 0; i<clientList.size();i++){
+                if(clientList.get(i).getClient_id() == cid){
+                    clientList.remove(i);
+                    return;
+                }
+            }
+        }
+    }
+    public Client getClientByID(int cid){
+        synchronized (clientList){
+            for (Client c: clientList){
+                if(c.getClient_id() == cid){
+                    return c;
+                }
+            }
+        }
+        return null;
     }
 }

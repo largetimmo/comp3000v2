@@ -5,3 +5,5 @@ out/
 jquery*
 bootstrap*
 test/
+target/
+classes/
