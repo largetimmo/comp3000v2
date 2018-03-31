@@ -10,6 +10,9 @@ public class SocketContainer{
     public static SocketContainer getInstance(){
         return instance;
     }
+
+
+
     private Map<Integer,Remote> remoteContainer;
     private Map<Integer, Client> clientContainer;
 

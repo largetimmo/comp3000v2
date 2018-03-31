@@ -25,8 +25,12 @@ public class RemoteSocketHandler {
         this.session = session;
         remote = new Remote();
         remote.setPassword(password);
-        remote.setSession(session);
+        remote.setRemoteSocketHandler(this);
         SocketContainer.getInstance().addRemoteConnection(remote);
+        System.out.println("NEW CONNECTION:"+remote.getId());
+
+
+
     }
 
     @OnClose
@@ -35,40 +39,46 @@ public class RemoteSocketHandler {
     }
 
     @OnMessage
-    public void onMessage(String message, Session send_session) throws IOException {
-        JSONObject jsonObject = (JSONObject) JSONObject.parse(message);
-        String action = jsonObject.get("ACTION").toString();
-        JSONObject return_json = new JSONObject();
-        return_json.put("ACTION", action);
-        switch (action) {
-            case LOGIN_ACTION:
-                JSONObject login_info = new JSONObject();
-                login_info.put("UID", remote.getId());
-                login_info.put("PWD", remote.getPassword());
-                return_json.put("TARGET", "");
-                return_json.put("DATA", login_info);
-                sendMessage(return_json.toJSONString());
-                break;
-            case GET_PROCESS_ACTION:
-                int targetID = jsonObject.getInteger("TARGET");
-                Client client = remote.getClientByID(targetID);
-                if(client == null){
+    public void onMessage(String message, Session send_session){
+        try {
+            System.out.println(send_session.getId());
+            JSONObject jsonObject = JSONObject.parseObject(message);
+            String action = jsonObject.get("ACTION").toString();
+            JSONObject return_json = new JSONObject();
+            return_json.put("ACTION", action);
+            switch (action) {
+                case LOGIN_ACTION:
+                    JSONObject login_info = new JSONObject();
+                    login_info.put("UID", remote.getId());
+                    login_info.put("PWD", remote.getPassword());
+                    return_json.put("TARGET", "");
+                    return_json.put("DATA", login_info);
+                    sendMessage(return_json.toJSONString());
                     break;
-                }
-                jsonObject.put("TARGET",remote.getId());
-                client.getClientSocketHandler().sendMessage(jsonObject.toString());
-                break;
-            case KILL_PROCESS_ACTION:
-                targetID = jsonObject.getInteger("TARGET");
-                client = remote.getClientByID(targetID);
-                if(client == null){
+                case GET_PROCESS_ACTION:
+                    int targetID = jsonObject.getInteger("TARGET");
+                    Client client = remote.getClientByID(targetID);
+                    if(client == null){
+                        break;
+                    }
+                    jsonObject.put("TARGET",remote.getId());
+                    client.getClientSocketHandler().sendMessage(jsonObject.toString());
                     break;
-                }
-                jsonObject.put("TARGET",remote.getId());
-                client.getClientSocketHandler().sendMessage(jsonObject.toString());
-                break;
-            default:
-                break;
+                case KILL_PROCESS_ACTION:
+                    targetID = jsonObject.getInteger("TARGET");
+                    client = remote.getClientByID(targetID);
+                    if(client == null){
+                        break;
+                    }
+                    jsonObject.put("TARGET",remote.getId());
+                    client.getClientSocketHandler().sendMessage(jsonObject.toString());
+                    break;
+                default:
+                    break;
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
         }
 
 
