@@ -26,15 +26,6 @@ public class ClientSocketHandler {
     public void onOpen(Session session) {
         this.session = session;
         client = new Client(this);
-
-        Remote remote = new Remote();
-        remote.setPassword("123");
-        remote.setId(1);
-        SocketContainer.getInstance().addRemoteConnection(remote);
-        Remote remote2 = new Remote();
-        remote.setPassword("123");
-        remote.setId(2);
-        SocketContainer.getInstance().addRemoteConnection(remote2);
     }
 
     @OnClose
@@ -59,6 +50,7 @@ public class ClientSocketHandler {
                     JSONObject return_message = JSONHelper.constructJson(action,rid,"SUCCESS");
                     client.addRemote(remote);
                     sendMessage(return_message.toJSONString());
+
                 }else{
                     //invalid login
                     JSONObject return_message = JSONHelper.constructJson(action,"","FAIL");
