@@ -19,22 +19,28 @@ public class ClientSocketHandler {
     private final String Action_Tag = "ACTION";
     private final String Target_Tag = "TARGET";
     private final String Data_Tag = "DATA";
-
     private Client client;
 
     @OnOpen
     public void onOpen(Session session) {
         this.session = session;
         client = new Client(this);
+        System.out.println("NEW CLIENT CONNECTION:"+client.getClient_id());
+        session.setMaxTextMessageBufferSize(3276800);
+        session.setMaxBinaryMessageBufferSize(3276800);
+        session.setMaxIdleTimeout(0);
     }
 
     @OnClose
-    public void onClose() {
+    public void onClose(CloseReason reason) {
+
+        System.out.println("Client closed"+reason.getCloseCode());
 
     }
 
     @OnMessage
     public void onMessage(String message, Session send_session) throws IOException {
+        System.out.println(send_session+":"+message);
         JSONObject jsonObject = JSONObject.parseObject(message);
         String action = jsonObject.getString("ACTION");
         switch (action) {

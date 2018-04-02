@@ -5,6 +5,7 @@ import com.sun.istack.internal.Nullable;
 import pojo.Client;
 import pojo.Remote;
 import server.SocketContainer;
+import util.JSONHelper;
 
 
 import javax.websocket.*;
@@ -27,19 +28,23 @@ public class RemoteSocketHandler {
         remote.setPassword(password);
         remote.setRemoteSocketHandler(this);
         SocketContainer.getInstance().addRemoteConnection(remote);
-        System.out.println("NEW CONNECTION:"+remote.getId());
-
-
+        System.out.println("NEW REMOTE CONNECTION:"+remote.getId());
+        session.setMaxTextMessageBufferSize(3276800);
+        session.setMaxBinaryMessageBufferSize(3276800);
+        session.setMaxIdleTimeout(0);
 
     }
 
     @OnClose
-    public void onClose() {
-        System.out.println(remote.getId() + " Disconnected");
+    public void onClose(CloseReason reason) {
+        System.out.println("Remote:"+remote.getId() + " Disconnected");
+        System.out.println(reason.getCloseCode());
+        System.out.println(reason.getReasonPhrase());
     }
 
     @OnMessage
     public void onMessage(String message, Session send_session){
+        System.out.println(send_session+":"+message);
         try {
             System.out.println(send_session.getId());
             JSONObject jsonObject = JSONObject.parseObject(message);
