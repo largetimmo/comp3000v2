@@ -1,7 +1,6 @@
 package pojo;
 
 import web.ClientSocketHandler;
-import web.RemoteSocketHandler;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,7 +11,8 @@ public class Client {
     private int client_id;
     private ClientSocketHandler clientSocketHandler;
     private List<Remote> remoteList = Collections.synchronizedList(new ArrayList<Remote>());
-    public Client(ClientSocketHandler clientSocketHandler){
+
+    public Client(ClientSocketHandler clientSocketHandler) {
         client_id = CID++;
         this.clientSocketHandler = clientSocketHandler;
     }
@@ -25,15 +25,16 @@ public class Client {
         return clientSocketHandler;
     }
 
-    public void addRemote(Remote remote){
+    public void addRemote(Remote remote) {
         synchronized (remoteList) {
             remoteList.add(remote);
         }
     }
-    public Remote getRemoteById(int rid){
-        synchronized (remoteList){
-            for (Remote remote : remoteList){
-                if(remote.getId() == rid){
+
+    public Remote getRemoteById(int rid) {
+        synchronized (remoteList) {
+            for (Remote remote : remoteList) {
+                if (remote.getId() == rid) {
                     return remote;
                 }
             }

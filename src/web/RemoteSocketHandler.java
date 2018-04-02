@@ -1,23 +1,19 @@
 package web;
 
 import com.alibaba.fastjson.JSONObject;
-import com.sun.istack.internal.Nullable;
 import pojo.Client;
 import pojo.Remote;
 import server.SocketContainer;
-import util.JSONHelper;
-
 
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
-import java.io.IOException;
 
 @ServerEndpoint(value = "/ws/remote")
 public class RemoteSocketHandler {
+    private static String password = "1";
     private final String LOGIN_ACTION = "LOGIN";
     private final String GET_PROCESS_ACTION = "GETPROCES";
     private final String KILL_PROCESS_ACTION = "KILL";
-    private static String password = "1";
     private Session session;
     private Remote remote;
 
@@ -28,7 +24,7 @@ public class RemoteSocketHandler {
         remote.setPassword(password);
         remote.setRemoteSocketHandler(this);
         SocketContainer.getInstance().addRemoteConnection(remote);
-        System.out.println("NEW REMOTE CONNECTION:"+remote.getId());
+        System.out.println("NEW REMOTE CONNECTION:" + remote.getId());
         session.setMaxTextMessageBufferSize(3276800);
         session.setMaxBinaryMessageBufferSize(3276800);
         session.setMaxIdleTimeout(0);
@@ -37,14 +33,14 @@ public class RemoteSocketHandler {
 
     @OnClose
     public void onClose(CloseReason reason) {
-        System.out.println("Remote:"+remote.getId() + " Disconnected");
+        System.out.println("Remote:" + remote.getId() + " Disconnected");
         System.out.println(reason.getCloseCode());
         System.out.println(reason.getReasonPhrase());
     }
 
     @OnMessage
-    public void onMessage(String message, Session send_session){
-        System.out.println(send_session+":"+message);
+    public void onMessage(String message, Session send_session) {
+        System.out.println(send_session + ":" + message);
         try {
             System.out.println(send_session.getId());
             JSONObject jsonObject = JSONObject.parseObject(message);
@@ -63,26 +59,26 @@ public class RemoteSocketHandler {
                 case GET_PROCESS_ACTION:
                     int targetID = jsonObject.getInteger("TARGET");
                     Client client = remote.getClientByID(targetID);
-                    if(client == null){
+                    if (client == null) {
                         break;
                     }
-                    jsonObject.put("TARGET",remote.getId());
+                    jsonObject.put("TARGET", remote.getId());
                     client.getClientSocketHandler().sendMessage(jsonObject.toString());
                     break;
                 case KILL_PROCESS_ACTION:
                     targetID = jsonObject.getInteger("TARGET");
                     client = remote.getClientByID(targetID);
-                    if(client == null){
+                    if (client == null) {
                         break;
                     }
-                    jsonObject.put("TARGET",remote.getId());
+                    jsonObject.put("TARGET", remote.getId());
                     client.getClientSocketHandler().sendMessage(jsonObject.toString());
                     break;
                 default:
                     break;
             }
 
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 

@@ -2,18 +2,18 @@ package pojo;
 
 import web.RemoteSocketHandler;
 
-import javax.websocket.Session;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public class Remote {
     private static int RID = 0;
+    private final List<Client> clientList = Collections.synchronizedList(new ArrayList<Client>());
     private RemoteSocketHandler remoteSocketHandler;
     private int id;
     private String password;
-    private final List<Client> clientList = Collections.synchronizedList(new ArrayList<Client>());
-    public Remote(){
+
+    public Remote() {
         id = RID++;
     }
 
@@ -45,7 +45,7 @@ public class Remote {
         this.password = password;
     }
 
-    public boolean verifyClientID(int cid){
+    public boolean verifyClientID(int cid) {
         synchronized (clientList) {
             for (Client c : clientList) {
                 if (c.getClient_id() == cid) {
@@ -56,25 +56,28 @@ public class Remote {
         }
         return false;
     }
-    public void addClient(Client client){
-        synchronized (clientList){
+
+    public void addClient(Client client) {
+        synchronized (clientList) {
             clientList.add(client);
         }
     }
-    public void removeClientByID(int cid){
-        synchronized (clientList){
-            for (int i = 0; i<clientList.size();i++){
-                if(clientList.get(i).getClient_id() == cid){
+
+    public void removeClientByID(int cid) {
+        synchronized (clientList) {
+            for (int i = 0; i < clientList.size(); i++) {
+                if (clientList.get(i).getClient_id() == cid) {
                     clientList.remove(i);
                     return;
                 }
             }
         }
     }
-    public Client getClientByID(int cid){
-        synchronized (clientList){
-            for (Client c: clientList){
-                if(c.getClient_id() == cid){
+
+    public Client getClientByID(int cid) {
+        synchronized (clientList) {
+            for (Client c : clientList) {
+                if (c.getClient_id() == cid) {
                     return c;
                 }
             }
