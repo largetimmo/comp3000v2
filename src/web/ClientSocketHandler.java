@@ -40,7 +40,6 @@ public class ClientSocketHandler {
 
     @OnMessage
     public void onMessage(String message, Session send_session) throws IOException {
-        System.out.println(send_session + ":" + message);
         JSONObject jsonObject = JSONObject.parseObject(message);
         String action = jsonObject.getString("ACTION");
         switch (action) {
@@ -69,7 +68,7 @@ public class ClientSocketHandler {
                 if (remote == null) {
                     break;
                 }
-                JSONObject send_Message = JSONHelper.constructJson(action, client.getClient_id(), "");
+                JSONObject send_Message = JSONHelper.constructJson(action, client.getClient_id(),jsonObject.get(Data_Tag));
                 remote.getRemoteSocketHandler().sendMessage(send_Message.toJSONString());
                 break;
             case KILL_PROCESS_ACTION:

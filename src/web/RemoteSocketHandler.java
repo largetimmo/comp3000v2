@@ -7,6 +7,7 @@ import server.SocketContainer;
 
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
+import java.util.Random;
 
 @ServerEndpoint(value = "/ws/remote")
 public class RemoteSocketHandler {
@@ -21,7 +22,7 @@ public class RemoteSocketHandler {
     public void onOpen(Session session) {
         this.session = session;
         remote = new Remote();
-        remote.setPassword(password);
+        remote.setPassword(getPassword());
         remote.setRemoteSocketHandler(this);
         SocketContainer.getInstance().addRemoteConnection(remote);
         System.out.println("NEW REMOTE CONNECTION:" + remote.getId());
@@ -40,7 +41,6 @@ public class RemoteSocketHandler {
 
     @OnMessage
     public void onMessage(String message, Session send_session) {
-        System.out.println(send_session + ":" + message);
         try {
             System.out.println(send_session.getId());
             JSONObject jsonObject = JSONObject.parseObject(message);
@@ -88,6 +88,15 @@ public class RemoteSocketHandler {
     @OnError
     public void onError(Session error_session, Throwable throwable) {
 
+    }
+
+    private static String getPassword(){
+        Random random = new Random();
+        String password = "";
+        for(int i = 0; i< 10; i++){
+            password+=random.nextInt(10);
+        }
+        return password;
     }
 
     public void sendMessage(String message) {
